@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="searchtype">
+        <item>"Theo số"</item>
+        <item>"Theo họ tên"</item>
+        <item>"Theo địa chỉ"</item>
+    </string-array>
+    <string-array name="searchtype_value">
+        <item>"0"</item>
+        <item>"1"</item>
+        <item>"2"</item>
+    </string-array>
+    <string-array name="menu">
+        <item>"Gọi điện"</item>
+        <item>"Gửi tin nhắn"</item>
+        <item>"Chỉnh sửa"</item>
+        <item>"Xóa số"</item>
+    </string-array>
+</resources>

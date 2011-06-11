@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="hint_color">#FF9224</color>
+<color name="text_color">#FFFFFF</color>
+<color name="background_main">#000000</color>
+<color name="phone">#92D7F8</color>
+</resources>

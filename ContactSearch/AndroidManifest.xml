@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.taiva.cts"
+      android:versionCode="1"
+      android:versionName="1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-sdk android:minSdkVersion="7" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"></uses-permission>
+    <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"></uses-permission>
+    <uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_SMS"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"></uses-permission>
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"></uses-permission>
+    <application android:icon="@drawable/icon" 
+    			 android:label="@string/app_name"
+    			 android:theme="@android:style/Theme.NoTitleBar">
+        <activity android:name="com.taiva.cts.SplashScreen"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> 
+        <activity android:name="com.taiva.cts.ContactSearch"
+                  android:label="@string/app_name"
+                  android:windowSoftInputMode="stateAlwaysVisible">
+        </activity>
+        <activity android:name="com.taiva.cts.Preferences"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name="com.taiva.cts.Modify"
+                  android:label="@string/app_name">
+        </activity>
+        
+        <provider android:name="com.taiva.cts.DataProvider" android:authorities="com.taiva.cts.DataProvider" />
+        <receiver android:name="IncomingCallReceiver">
+        	<intent-filter>
+				<action android:name="android.intent.action.PHONE_STATE" />
+			</intent-filter>
+        </receiver>
+        <receiver android:name="OutgoingCallReceiver">
+        	<intent-filter>
+				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+			</intent-filter>
+        </receiver>
+    </application>
+</manifest>
