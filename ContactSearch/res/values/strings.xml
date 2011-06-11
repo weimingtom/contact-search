@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name1">TRA CỨU DANH BẠ ĐIỆN THOẠI</string>
+    <string name="app_name">Danh bạ</string>
+    <string name="app_ver">Phiên bản 1.1</string>
+    <string name="insert_phone">Nhập thông tin tra cứu</string>
+    <string name="search_match">Tìm gần đúng</string>
+    <string name="no_result">Không tìm thấy thông tin thuê bao.</string>
+    <string name="searchtype">Kiểu tìm</string>
+    <string name="searchoption">Tìm theo</string>
+    <string name="searchmatch">Loại tìm</string>
+    <string name="searchmatch_des">Tìm chính xác hoặc gần đúng</string>
+    <string name="searchtype_des">Tìm theo số, tên, địa chỉ</string>
+    <string name="author_email">taiva.dlc@gmail.com</string>
+    <string name="author_name">Copyright(C) 2011, VAT</string>
+    <string name="author_ctc">Võ Anh Tài</string>
+    <string name="about">Thông tin</string>
+    <string name="phone">Số điện thoại:</string>
+    <string name="name">Họ tên:</string>
+    <string name="address">Địa chỉ:</string>
+    <string name="save">Lưu</string>
+    <string name="info">Hiển thị danh bạ cuộc gọi</string>
+    <string name="incoming">Cuộc gọi đến</string>
+    <string name="incoming_des">Hiển thị danh bạ khi gọi đến</string>
+    <string name="outgoing">Cuộc gọi đi</string>
+    <string name="outgoing_des">Hiển thị danh bạ khi gọi đi</string>
+</resources>
