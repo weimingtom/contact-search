@@ -36,27 +36,30 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                 	{
                 		phoneNumber = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);  
                         Log.i("IncomingCallReceiver","Incomng Number: " + phoneNumber);                        
-                        phoneNumber = phoneNumber.substring(1);
-                		Uri uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/0/phone/" + phoneNumber);
-                		Log.i("IncomingCallReceiver","uri = " + uri.toString());
-                		Cursor r = context.getContentResolver().query(uri,null,null,null,null);
-                		                		
-                		//Only notify when info is found
-                		if (r != null && r.getCount() > 0)
-                		{
-                			r.moveToFirst();
-                			
-                			StringBuilder info = new StringBuilder();
-                			info.append("Tên: " + r.getString(2) + "\n");
-                			info.append("Địa chỉ: " + r.getString(3));
-                			r.close();
-                			
-                			strInfo = info.toString();
-                			Log.i("IncomingCallReceiver","info = " + strInfo);
-                			toast = Toast.makeText(context, strInfo, Toast.LENGTH_LONG);
-                			toast.setGravity(Gravity.TOP, 0, 0);
-                			fireLongToast();
-                		}
+                        if (phoneNumber != null)
+                        {
+                        	phoneNumber = phoneNumber.substring(1);
+                    		Uri uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/0/phone/" + phoneNumber);
+                    		Log.i("IncomingCallReceiver","uri = " + uri.toString());
+                    		Cursor r = context.getContentResolver().query(uri,null,null,null,null);
+                    		                		
+                    		//Only notify when info is found
+                    		if (r != null && r.getCount() > 0)
+                    		{
+                    			r.moveToFirst();
+                    			
+                    			StringBuilder info = new StringBuilder();
+                    			info.append("Tên: " + r.getString(2) + "\n");
+                    			info.append("Địa chỉ: " + r.getString(3));
+                    			r.close();
+                    			
+                    			strInfo = info.toString();
+                    			Log.i("IncomingCallReceiver","info = " + strInfo);
+                    			toast = Toast.makeText(context, strInfo, Toast.LENGTH_LONG);
+                    			toast.setGravity(Gravity.TOP, 0, 80);
+                    			fireLongToast();
+                    		}
+                        }
                 	}
                 }
         }
