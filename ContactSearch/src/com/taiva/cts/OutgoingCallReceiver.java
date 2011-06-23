@@ -24,34 +24,36 @@ public class OutgoingCallReceiver extends BroadcastReceiver {
                 Bundle bundle = intent.getExtras();
                 if(null == bundle)
                         return;
-                phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-                Log.i("OutgoingCallReceiver",phoneNumber);
-                Log.i("OutgoingCallReceiver",bundle.toString());
-                phoneNumber = phoneNumber.substring(1);
                 
                 prefs = PreferenceManager.getDefaultSharedPreferences(context);
             	if (prefs.getBoolean("chkOutgoing", true) == true)
             	{
-	        		Uri uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/0/phone/" + phoneNumber);
-	        		Log.i("OutgoingCallReceiver","uri = " + uri.toString());
-	        		Cursor r = context.getContentResolver().query(uri,null,null,null,null);
-	 
-	        		//Only notify when info is found
-	        		if (r != null && r.getCount() > 0)
-	        		{
-	        			r.moveToFirst();
-	
-	        			StringBuilder info = new StringBuilder();
-	        			info.append("Tên: " + r.getString(2) + "\n");
-	        			info.append("Địa chỉ: " + r.getString(3));
-	        			r.close();
-	        			
-	        			strInfo = info.toString();
-	        			Log.i("OutgoingCallReceiver","info = " + strInfo);
-	        			toast = Toast.makeText(context, strInfo, Toast.LENGTH_LONG);
-	        			toast.setGravity(Gravity.TOP, 0, 0);
-	        			fireLongToast();
-	        		}
+            		phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+                    Log.i("OutgoingCallReceiver",phoneNumber);
+                    Log.i("OutgoingCallReceiver",bundle.toString());
+                    if (phoneNumber != null)
+                    {
+	                    phoneNumber = phoneNumber.substring(1);
+		        		Uri uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/0/phone/" + phoneNumber);
+		        		Log.i("OutgoingCallReceiver","uri = " + uri.toString());
+		        		Cursor r = context.getContentResolver().query(uri,null,null,null,null);
+		 
+		        		//Only notify when info is found
+		        		if (r != null && r.getCount() > 0)
+		        		{
+		        			r.moveToFirst();
+		        			StringBuilder info = new StringBuilder();
+		        			info.append("Tên: " + r.getString(2) + "\n");
+		        			info.append("Địa chỉ: " + r.getString(3));
+		        			r.close();
+		        			
+		        			strInfo = info.toString();
+		        			Log.i("OutgoingCallReceiver","info = " + strInfo);
+		        			toast = Toast.makeText(context, strInfo, Toast.LENGTH_LONG);
+		        			toast.setGravity(Gravity.TOP, 0, 80);
+		        			fireLongToast();
+		        		}
+                    }
             	}
         }
         
