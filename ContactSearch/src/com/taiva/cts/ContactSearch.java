@@ -22,7 +22,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
+//import android.widget.TextView;
+import android.widget.Toast;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -53,7 +54,8 @@ public class ContactSearch extends ListActivity {
         
         final EditText txtSearch = (EditText) findViewById(R.id.txtSearch);
         final Button btSearch = (Button) findViewById(R.id.btSearch);
-                
+        final Button btSet = (Button) findViewById(R.id.btSet);
+        
         prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         imm = (InputMethodManager) ContactSearch.this.getSystemService(Context.INPUT_METHOD_SERVICE);
         
@@ -63,21 +65,98 @@ public class ContactSearch extends ListActivity {
 		{
 			Log.i(TAG, "input phone");
 			txtSearch.setInputType(InputType.TYPE_CLASS_PHONE);
+			btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.phone_icon));
 		}
-		else 
+		else if (searchType == 1) 
 		{
 			Log.i(TAG, "input text");
 			txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
+			btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.name));
+		}
+		else
+		{
+			Log.i(TAG, "input text");
+			txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
+			btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.address));
 		}
        
 		// Thực hiện chức năng tra cứu
+        
+        final ActionItem phoneAction = new ActionItem();
+         
+        phoneAction.setTitle("Điện thoại");
+        phoneAction.setIcon(getResources().getDrawable(R.drawable.phone_icon));
+ 
+        final ActionItem nameAction = new ActionItem();
+         
+        nameAction.setTitle("Họ tên");
+        nameAction.setIcon(getResources().getDrawable(R.drawable.name));
+         
+        final ActionItem addressAction = new ActionItem();
+         
+        addressAction.setTitle("Địa chỉ");
+        addressAction.setIcon(getResources().getDrawable(R.drawable.address));
+        
+        btSet.setOnClickListener(new OnClickListener() {
+      	
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				final QuickAction mQuickAction = new QuickAction(v);
+				
+				phoneAction.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(ContactSearch.this, "Tìm theo số điện thoại", Toast.LENGTH_LONG).show();
+                        btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.phone_icon));
+                        writePref("listPref", "0");
+                        txtSearch.setText("");
+                        txtSearch.setInputType(InputType.TYPE_CLASS_PHONE);
+                        mQuickAction.dismiss();
+                    }
+                });
+ 
+                nameAction.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(ContactSearch.this, "Tìm theo họ tên", Toast.LENGTH_LONG).show();
+                        btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.name));
+                        writePref("listPref", "1");
+                        txtSearch.setText("");
+                        txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
+                        mQuickAction.dismiss();
+                    }
+                });
+                 
+                addressAction.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(ContactSearch.this, "Tìm theo địa chỉ", Toast.LENGTH_LONG).show();
+                        btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.address));
+                        writePref("listPref", "2");
+                        txtSearch.setText("");
+                        txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
+                        mQuickAction.dismiss();
+                    }
+                });
+                 
+                mQuickAction.addActionItem(phoneAction);
+                mQuickAction.addActionItem(nameAction);
+                mQuickAction.addActionItem(addressAction);
+                 
+                mQuickAction.setAnimStyle(QuickAction.ANIM_AUTO);
+                
+                mQuickAction.show();
+			}
+		});        
+        
         btSearch.setOnClickListener(new OnClickListener() {
         	//@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				
 				search = txtSearch.getText().toString().trim();
-				final boolean bool;
+				//final boolean bool;
 				Log.i(TAG, "search=" + search);
 				
 				// check null search 
@@ -97,7 +176,7 @@ public class ContactSearch extends ListActivity {
 	                    return;
 	            }
 				
-				bool = prefs.getBoolean("chkPref", true);
+				/*bool = prefs.getBoolean("chkPref", true);
 				if (bool == false)
 				{
 					matchValue = 0;
@@ -105,7 +184,7 @@ public class ContactSearch extends ListActivity {
 				else 
 				{
 					matchValue = 1;
-				}
+				}*/
 				
 				searchType = Integer.parseInt(prefs.getString("listPref", "0"));
 				// check phone number or string
@@ -128,16 +207,25 @@ public class ContactSearch extends ListActivity {
 					}
 				}
 				
-		        imm.hideSoftInputFromWindow(txtSearch.getWindowToken(), 0);
+		        imm.hideSoftInputFromWindow(txtSearch.getWindowToken(), 0); 
 		        
-				myProgressDialog = ProgressDialog.show(ContactSearch.this, "Đang chờ...", "Đang lấy số liệu...", true);
+				myProgressDialog = ProgressDialog.show(ContactSearch.this, "Xin chờ...", "Đang lấy số liệu...", true);
 					
 				new Thread(){ 
 			             public void run(){
 			                     try 
 			                     {
-			                    	r = getContactList(search, searchType, matchValue);
-			                    	handler.sendEmptyMessage(r);
+			                    	 if ((search.length() == 10 || search.length() == 11) && searchType == 0)
+			                    	 {
+			                    		 matchValue = 0; 
+			                    	 }
+			                    	 else
+			                    	 {
+			                    		 matchValue = 1;
+			                    	 }
+			                    	 r = getContactList(search, searchType, matchValue);
+			                    	 //r = getContactList(search);
+			                    	 handler.sendEmptyMessage(r);
 			                     } 
 			                     catch (Exception e) {
 			                             e.printStackTrace();
@@ -206,7 +294,7 @@ public class ContactSearch extends ListActivity {
 		}
 		return 1;
     }
-    
+   
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -217,22 +305,17 @@ public class ContactSearch extends ListActivity {
     
     public void displayResult()
     {
-    	TextView textViewResult = (TextView) findViewById(R.id.textViewResult);
-   	 	textViewResult.setText("");
    	 	if(r > 0)
    	 	{
 			Log.i(TAG, "Cursor is not null");
 	        String[] from = new String[] { DataProvider.COLUMN_PHONE, DataProvider.COLUMN_NAME, DataProvider.COLUMN_ADDRESS};
 	        int[] to = new int[] { R.id.phone, R.id.name, R.id.address};
 	        sca = new SimpleCursorAdapter(getBaseContext(),R.layout.contact_list , c, from, to);
-	        setListAdapter(sca);
-	        textViewResult.setText("Số lượng thuê bao tìm được: " + c.getCount());
-	        
+	        setListAdapter(sca);	        
 		}
 		else 
 		{
 			Log.i(TAG, "Cursor is null");
-           	textViewResult.setText(R.string.no_result); 
 		}
     }
     
@@ -329,4 +412,17 @@ public class ContactSearch extends ListActivity {
       Log.i(TAG, "select: " + menuItemName + ", " + phone);
       return true;
     }
+    
+    public void writePref(String key, String value) {
+    	prefs = getPreferences(Context.MODE_PRIVATE);
+    	SharedPreferences.Editor editor = prefs.edit();
+    	editor.putString(key, value);
+    	editor.commit();
+	}
+    
+    public String readPref(String key) {
+    	prefs = getPreferences(Context.MODE_PRIVATE);
+    	String value = prefs.getString(key, "0");
+    	return value;
+	}
 }

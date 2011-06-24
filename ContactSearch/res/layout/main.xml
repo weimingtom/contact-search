@@ -8,8 +8,7 @@
     android:baselineAligned="false"
 
     android:orientation="vertical"
-
-    android:background="@color/background_main" android:layout_height="fill_parent">
+	android:layout_height="fill_parent" android:background="@color/background_main">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -23,6 +22,7 @@
         android:baselineAligned="false"
 
         android:addStatesFromChildren="true">
+        <Button android:layout_width="wrap_content" android:id="@+id/btSet" android:layout_height="wrap_content" android:background="@drawable/search_icon"></Button>
 
         <EditText
             android:layout_height="wrap_content"
@@ -32,16 +32,15 @@
             android:paddingLeft="8dip"
             android:paddingRight="6dip"
 
-            android:hint="@string/insert_phone" android:id="@+id/txtSearch"/>
+            android:id="@+id/txtSearch"/>
 
         <Button
             android:layout_marginLeft="1dip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:drawableLeft="@drawable/ic_btn_search" android:id="@+id/btSearch"/>
+            android:drawableLeft="@drawable/ic_btn_search" android:id="@+id/btSearch" android:background="@color/background_main"/>
 
     </LinearLayout>
-    <TextView android:id="@+id/textViewResult" android:layout_height="wrap_content" android:layout_width="wrap_content"></TextView>
     <ListView android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@android:id/list"></ListView>
 </LinearLayout>

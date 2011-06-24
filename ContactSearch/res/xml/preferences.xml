@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
         <PreferenceCategory
-                android:title="@string/searchmatch">
-                <ListPreference
-                        android:title="@string/searchtype"
-                        android:summary="@string/searchtype_des"
-                        android:key="listPref"
-                        android:defaultValue="0"
-                        android:entries="@array/searchtype"
-                        android:entryValues="@array/searchtype_value" />
-        </PreferenceCategory>
-        <PreferenceCategory
-                android:title="@string/searchtype">
-                <CheckBoxPreference
-                        android:title="@string/search_match"
-                        android:defaultValue="false"
-                        android:summary="@string/searchmatch_des"
-                        android:key="chkPref" />
-        </PreferenceCategory>
-        <PreferenceCategory
                 android:title="@string/info">
                 <CheckBoxPreference
                         android:title="@string/incoming"
