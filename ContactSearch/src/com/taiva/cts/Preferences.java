@@ -5,15 +5,15 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
+//import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
  
 public class Preferences extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	
 	    public static SharedPreferences mShareRefs;   
-	    private ListPreference list;
-	    private CheckBoxPreference chk;
+	    //private ListPreference list;
+	    //private CheckBoxPreference chk;
 	    private CheckBoxPreference chkIncoming;
 	    private CheckBoxPreference chkOutgoing;
 	    
@@ -22,8 +22,8 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
                 super.onCreate(savedInstanceState);
                 addPreferencesFromResource(R.xml.preferences);
                 
-                list = (ListPreference) findPreference("listPref");
-                chk = (CheckBoxPreference) findPreference("chkPref");
+                //list = (ListPreference) findPreference("listPref");
+                //chk = (CheckBoxPreference) findPreference("chkPref");
                 chkIncoming = (CheckBoxPreference) findPreference("chkIncoming");
                 chkOutgoing = (CheckBoxPreference) findPreference("chkOutgoing");
         }
@@ -31,8 +31,8 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
         @Override
         protected void onResume() {
             super.onResume();
-            list.setSummary(list.getEntry());
-            chk.setSummary(chk.isChecked()? "Đang tìm gần đúng" : "Đang tìm chính xác" );
+            //list.setSummary(list.getEntry());
+            //chk.setSummary(chk.isChecked()? "Đang tìm gần đúng" : "Đang tìm chính xác" );
             chkIncoming.setSummary(R.string.incoming_des);
             chkOutgoing.setSummary(R.string.outgoing_des);
             getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
@@ -46,18 +46,18 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
 
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals("listPref")) {
-            	list.setSummary(list.getEntry());
-            	Toast.makeText(getBaseContext(), "Đã lưu loại tìm", Toast.LENGTH_SHORT).show();
+            	//list.setSummary(list.getEntry());
+            	//Toast.makeText(getBaseContext(), "Đã lưu loại tìm", Toast.LENGTH_SHORT).show();
             }
             else if (key.equals("chkPref")) {
-            	chk.setSummary(chk.isChecked()? "Đang tìm gần đúng" : "Đang tìm chính xác" );
-            	Toast.makeText(getBaseContext(), "Đã lưu kiểu tìm", Toast.LENGTH_SHORT).show();
+            	//chk.setSummary(chk.isChecked()? "Đang tìm gần đúng" : "Đang tìm chính xác" );
+            	//Toast.makeText(getBaseContext(), "Đã lưu kiểu tìm", Toast.LENGTH_SHORT).show();
             }
             else if (key.equals("chkIncoming")) {
-            	Toast.makeText(getBaseContext(), "Đã lưu", Toast.LENGTH_SHORT).show();
+            	Toast.makeText(getBaseContext(), "Hiển thị thông gọi đến", Toast.LENGTH_SHORT).show();
             }
             else if (key.equals("chkOutgoing")) {
-            	Toast.makeText(getBaseContext(), "Đã lưu", Toast.LENGTH_SHORT).show();
+            	Toast.makeText(getBaseContext(), "Hiển thị thông gọi đi", Toast.LENGTH_SHORT).show();
             }
         }
 
