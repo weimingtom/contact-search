@@ -18,8 +18,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 //import android.widget.TextView;
@@ -53,8 +53,8 @@ public class ContactSearch extends ListActivity {
         setContentView(R.layout.main);
         
         final EditText txtSearch = (EditText) findViewById(R.id.txtSearch);
-        final Button btSearch = (Button) findViewById(R.id.btSearch);
-        final Button btSet = (Button) findViewById(R.id.btSet);
+        final ImageButton btSearch = (ImageButton) findViewById(R.id.btSearch);
+        final ImageButton btSet = (ImageButton) findViewById(R.id.btSet);
         
         prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         imm = (InputMethodManager) ContactSearch.this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -65,19 +65,19 @@ public class ContactSearch extends ListActivity {
 		{
 			Log.i(TAG, "input phone");
 			txtSearch.setInputType(InputType.TYPE_CLASS_PHONE);
-			btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.phone_icon));
+			btSet.setImageDrawable(getResources().getDrawable(R.drawable.phone_icon));
 		}
 		else if (searchType == 1) 
 		{
 			Log.i(TAG, "input text");
 			txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
-			btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.name));
+			btSet.setImageDrawable(getResources().getDrawable(R.drawable.name));
 		}
 		else
 		{
 			Log.i(TAG, "input text");
 			txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
-			btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.address));
+			btSet.setImageDrawable(getResources().getDrawable(R.drawable.address));
 		}
        
 		// Thực hiện chức năng tra cứu
@@ -108,7 +108,7 @@ public class ContactSearch extends ListActivity {
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(ContactSearch.this, "Tìm theo số điện thoại", Toast.LENGTH_LONG).show();
-                        btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.phone_icon));
+                        btSet.setImageDrawable(getResources().getDrawable(R.drawable.phone_icon));
                         writePref("listPref", "0");
                         txtSearch.setText("");
                         txtSearch.setInputType(InputType.TYPE_CLASS_PHONE);
@@ -120,7 +120,7 @@ public class ContactSearch extends ListActivity {
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(ContactSearch.this, "Tìm theo họ tên", Toast.LENGTH_LONG).show();
-                        btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.name));
+                        btSet.setImageDrawable(getResources().getDrawable(R.drawable.name));
                         writePref("listPref", "1");
                         txtSearch.setText("");
                         txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -132,7 +132,7 @@ public class ContactSearch extends ListActivity {
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(ContactSearch.this, "Tìm theo địa chỉ", Toast.LENGTH_LONG).show();
-                        btSet.setBackgroundDrawable(getResources().getDrawable(R.drawable.address));
+                        btSet.setImageDrawable(getResources().getDrawable(R.drawable.address));
                         writePref("listPref", "2");
                         txtSearch.setText("");
                         txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
