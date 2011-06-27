@@ -38,8 +38,7 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                         Log.i("IncomingCallReceiver","Incomng Number: " + phoneNumber);                        
                         if (phoneNumber != null)
                         {
-                        	phoneNumber = phoneNumber.substring(1);
-                    		Uri uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/0/phone/" + phoneNumber);
+                    		Uri uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/0/_id/" + phoneNumber);
                     		Log.i("IncomingCallReceiver","uri = " + uri.toString());
                     		Cursor r = context.getContentResolver().query(uri,null,null,null,null);
                     		                		
