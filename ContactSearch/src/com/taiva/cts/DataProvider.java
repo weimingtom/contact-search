@@ -1,5 +1,9 @@
 package com.taiva.cts;
 
+import java.util.ArrayList;
+
+import com.taiva.cts.ContactSearch.ManagedCursor;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -26,11 +30,13 @@ public class DataProvider extends ContentProvider {
 	private static final int SEARCH_ADDRESS = 2; 
 	
 	private SQLiteDatabase mCurrentDB = null;
-
+	
+	private final ArrayList<ContactSearch.ManagedCursor> mManagedCursors = new ArrayList<ContactSearch.ManagedCursor>();
+	 
 	private static final UriMatcher uriMatcher;
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-		uriMatcher.addURI(PROVIDER_NAME, "opt/*/phone/*", SEARCH_PHONE);
+		uriMatcher.addURI(PROVIDER_NAME, "opt/*/_id/*", SEARCH_PHONE);
 		uriMatcher.addURI(PROVIDER_NAME, "opt/*/name/*", SEARCH_NAME);
 		uriMatcher.addURI(PROVIDER_NAME, "opt/*/address/*", SEARCH_ADDRESS);
 	}
@@ -67,7 +73,7 @@ public class DataProvider extends ContentProvider {
 
 	public void openDatabase()
 	{
-		String dbPath = "/sdcard/ContactSearch/data";
+		String dbPath = "/sdcard/ContactSearch/data.db";
 		Log.i(TAG,"Data path = " + dbPath);
 
 		//Close the database first if is was opened
@@ -114,18 +120,24 @@ public class DataProvider extends ContentProvider {
 		String query = "";
 		if (a==0)
 		{
-			query = "SELECT _id, ('0' || phone) as phone, name, address FROM contact WHERE phone = " + number;
+			query = "SELECT _id, _id as phone, name, address FROM contact WHERE _id MATCH '" + number+ "'";
+		}
+		else if (a==1) 
+		{
+			query = "SELECT _id, _id as phone, name, address FROM contact WHERE _id like '%" + number + "%'";
 		}
 		else 
 		{
-			query = "SELECT _id, ('0' || phone) as phone, name, address FROM contact WHERE phone like '%" + number + "%'";
+			query = "SELECT _id, _id as phone, name, address FROM contact WHERE _id MATCH '" + number + "*' ORDER BY _id ASC";
 		}
+		Log.i(TAG, "query = " + query);
+		
 		if (mCurrentDB == null)
 		{
 			openDatabase();
 		}
-		//Log.i(TAG, "not null");
 		Cursor r = mCurrentDB.rawQuery(query, null);
+	    startManagingCursor(r);
 		Log.i(TAG, query);
 		Log.i(TAG, "column=" + r.getColumnCount() + ", row=" + r.getCount());
 		return r;
@@ -161,20 +173,17 @@ public class DataProvider extends ContentProvider {
 	private Cursor getDataFromName(int a, String name)
 	{
 		String query = "";
-		if (a==0)
-		{
-			query = "SELECT _id, ('0' || phone) as phone, name, address FROM contact WHERE name = '" + name + "'";
-		}
-		else 
-		{
-			query = "SELECT _id, ('0' || phone) as phone, name, address FROM contact WHERE name like '%" + name + "%'";
-		}
+		query = "SELECT _id, _id as phone, name, address FROM contact WHERE name MATCH '" + name + "'";
+		query = query + " UNION SELECT _id, _id as phone, name, address FROM contact WHERE raw_name MATCH '" + name.toLowerCase() + "' ORDER BY name";
+		Log.i(TAG, "query = " + query);
+		
 		if (mCurrentDB == null)
 		{
 			openDatabase();
 		}
 		
 		Cursor r = mCurrentDB.rawQuery(query, null);
+		startManagingCursor(r);
 		Log.i(TAG, query);
 		Log.i(TAG, "column=" + r.getColumnCount() + ", row=" + r.getCount());
 		return r;
@@ -183,20 +192,17 @@ public class DataProvider extends ContentProvider {
 	private Cursor getDataFromAddress(int a, String address)
 	{
 		String query = "";
-		if (a==0)
-		{
-			query = "SELECT _id, ('0' || phone) as phone, name, address FROM contact WHERE address = '" + address + "'";
-		}
-		else 
-		{
-			query = "SELECT _id, ('0' || phone) as phone, name, address FROM contact WHERE address like '%" + address + "%'";
-		}
+		query = "SELECT _id, _id as phone, name, address FROM contact WHERE address MATCH '" + address + "'";
+		query = query + " UNION SELECT _id, _id as phone, name, address FROM contact WHERE raw_address MATCH '" + address.toLowerCase() + "' ORDER BY address";
+		Log.i(TAG, "query = " + query);
+
 		if (mCurrentDB == null)
 		{
 			openDatabase();
 		}
 		
 		Cursor r = mCurrentDB.rawQuery(query, null);
+		startManagingCursor(r);
 		Log.i(TAG, query);
 		Log.i(TAG, "column=" + r.getColumnCount() + ", row=" + r.getCount());
 		return r;
@@ -322,5 +328,24 @@ public class DataProvider extends ContentProvider {
 	        	return null;
 		}
 	}
+	
+	public void startManagingCursor(Cursor c) {
+        synchronized (mManagedCursors) {
+            mManagedCursors.add(new ManagedCursor(c));
+        }
+    }
+    
+    public void stopManagingCursor(Cursor c) {
+        synchronized (mManagedCursors) {
+            final int N = mManagedCursors.size();
+            for (int i=0; i<N; i++) {
+                ManagedCursor mc = mManagedCursors.get(i);
+                if (mc.mCursor == c) {
+                    mManagedCursors.remove(i);
+                    break;
+                }
+            }
+        }
+    }
 
 }

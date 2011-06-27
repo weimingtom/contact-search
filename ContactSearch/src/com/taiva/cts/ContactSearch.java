@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -18,18 +19,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-//import android.widget.TextView;
-import android.widget.Toast;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
+import android.text.TextWatcher;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import com.taiva.cts.R;
 
@@ -46,13 +48,48 @@ public class ContactSearch extends ListActivity {
     private InputMethodManager imm;
     private SimpleCursorAdapter sca;
     private String search = "";
+    private AutoCompleteTextView txtSearch;
+    private ArrayAdapter<String> aCA;
+
+    public static final class ManagedCursor {
+        ManagedCursor(Cursor cursor) {
+            mCursor = cursor;
+            mReleased = false;
+            mUpdated = false;
+        }
+
+        public final Cursor mCursor;
+        public boolean mReleased;
+        public boolean mUpdated;
+    }
+    private final static ArrayList<ManagedCursor> mManagedCursors = new ArrayList<ManagedCursor>();
+    
+    public void startManagingCursor(Cursor c) {
+        synchronized (mManagedCursors) {
+            mManagedCursors.add(new ManagedCursor(c));
+        }
+    }
+    
+    public void stopManagingCursor(Cursor c) {
+        synchronized (mManagedCursors) {
+            final int N = mManagedCursors.size();
+            for (int i=0; i<N; i++) {
+                ManagedCursor mc = mManagedCursors.get(i);
+                if (mc.mCursor == c) {
+                    mManagedCursors.remove(i);
+                    break;
+                }
+            }
+        }
+    }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        final EditText txtSearch = (EditText) findViewById(R.id.txtSearch);
+        txtSearch = (AutoCompleteTextView) findViewById(R.id.txtSearch);
+        txtSearch.addTextChangedListener(textWacther);
         final ImageButton btSearch = (ImageButton) findViewById(R.id.btSearch);
         final ImageButton btSet = (ImageButton) findViewById(R.id.btSet);
         
@@ -79,7 +116,7 @@ public class ContactSearch extends ListActivity {
 			txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
 			btSet.setImageDrawable(getResources().getDrawable(R.drawable.address));
 		}
-       
+        
 		// Thực hiện chức năng tra cứu
         
         final ActionItem phoneAction = new ActionItem();
@@ -107,8 +144,7 @@ public class ContactSearch extends ListActivity {
 				phoneAction.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(ContactSearch.this, "Tìm theo số điện thoại", Toast.LENGTH_LONG).show();
-                        btSet.setImageDrawable(getResources().getDrawable(R.drawable.phone_icon));
+                    	btSet.setImageDrawable(getResources().getDrawable(R.drawable.phone_icon));
                         writePref("listPref", "0");
                         txtSearch.setText("");
                         txtSearch.setInputType(InputType.TYPE_CLASS_PHONE);
@@ -119,8 +155,7 @@ public class ContactSearch extends ListActivity {
                 nameAction.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(ContactSearch.this, "Tìm theo họ tên", Toast.LENGTH_LONG).show();
-                        btSet.setImageDrawable(getResources().getDrawable(R.drawable.name));
+                    	btSet.setImageDrawable(getResources().getDrawable(R.drawable.name));
                         writePref("listPref", "1");
                         txtSearch.setText("");
                         txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -131,8 +166,7 @@ public class ContactSearch extends ListActivity {
                 addressAction.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(ContactSearch.this, "Tìm theo địa chỉ", Toast.LENGTH_LONG).show();
-                        btSet.setImageDrawable(getResources().getDrawable(R.drawable.address));
+                    	btSet.setImageDrawable(getResources().getDrawable(R.drawable.address));
                         writePref("listPref", "2");
                         txtSearch.setText("");
                         txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -176,17 +210,8 @@ public class ContactSearch extends ListActivity {
 	                    return;
 	            }
 				
-				/*bool = prefs.getBoolean("chkPref", true);
-				if (bool == false)
-				{
-					matchValue = 0;
-				}
-				else 
-				{
-					matchValue = 1;
-				}*/
-				
 				searchType = Integer.parseInt(prefs.getString("listPref", "0"));
+				
 				// check phone number or string
 				if (searchType == 0)
 				{
@@ -224,7 +249,6 @@ public class ContactSearch extends ListActivity {
 			                    		 matchValue = 1;
 			                    	 }
 			                    	 r = getContactList(search, searchType, matchValue);
-			                    	 //r = getContactList(search);
 			                    	 handler.sendEmptyMessage(r);
 			                     } 
 			                     catch (Exception e) {
@@ -243,6 +267,51 @@ public class ContactSearch extends ListActivity {
         registerForContextMenu(lv);
     }
     
+    final TextWatcher textWacther = new TextWatcher() {
+        @Override
+        public void afterTextChanged(Editable s) 
+        {
+        	
+        }
+       
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) 
+        {
+        	
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) 
+        {
+        	Log.i(TAG, "Text changed");
+            updateAdapter(s, aCA, txtSearch);
+        }
+    };
+    
+	private void updateAdapter(CharSequence s, ArrayAdapter<String> adapter, AutoCompleteTextView aCT) {
+		
+		searchType = Integer.parseInt(prefs.getString("listPref", "0"));
+	    if (s.toString().length() > 4)
+	    {
+	    	if (searchType == 0)
+	    	{
+	    		matchValue = 2;
+	    	}
+	    	else 
+	    	{
+	    		matchValue = 1;
+	    	}
+	    	// chỉ thực hiện tìm nhanh đối với tên và số 
+	    	if (searchType != 2)
+	    	{
+				r = getContactList(s.toString(), searchType, matchValue);
+				Log.i(TAG, "r = " + r);
+		    	displayResult();
+		    }
+	    }
+	}
+	
+	@Override
     public void onResume()
     {
     	super.onResume();
@@ -259,19 +328,28 @@ public class ContactSearch extends ListActivity {
 			txtSearch.setInputType(InputType.TYPE_CLASS_TEXT);
 		}
     }
-    
+	    
+	@Override
+    public void onDestroy()
+    {
+		super.onDestroy();
+		Log.i(TAG, "Exit app");
+		int numCursors = mManagedCursors.size();
+        for (int i = 0; i < numCursors; i++) {
+            ManagedCursor c = mManagedCursors.get(i);
+            if (c != null) {
+                c.mCursor.close();
+            }
+        }
+    }
+	
     public int getContactList(String search, int searchType, int matchValue)
     {
 		// tìm theo số điện thoại
 		if (searchType == 0)
 		{
-			if (search.substring(0, 1).equals("0"))
-			{
-				search = search.substring(1);
-				Log.i(TAG, "search =" + search);
-			}
 			Log.i(TAG, "searchType = " + searchType + ", search =" + search);
-			uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/" + matchValue + "/phone/" + search);
+			uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/" + matchValue + "/_id/" + search);
 		}
 		// tìm theo tên 
 		else if (searchType == 1)
@@ -284,14 +362,13 @@ public class ContactSearch extends ListActivity {
 			uri = Uri.parse("content://com.taiva.cts.DataProvider/opt/" + matchValue + "/address/" + search);
 		}
 		Log.i(TAG,"uri = " + uri.toString());
-	    
+		c = null;
 		c = getContentResolver().query(uri, new String[]{DataProvider._ID, DataProvider.COLUMN_PHONE, DataProvider.COLUMN_NAME, DataProvider.COLUMN_ADDRESS}, null, null, null);
- 		startManagingCursor(c);
-   	
 		if (c == null)
 		{
 			return 0;
 		}
+		startManagingCursor(c);
 		return 1;
     }
    
@@ -305,18 +382,12 @@ public class ContactSearch extends ListActivity {
     
     public void displayResult()
     {
-   	 	if(r > 0)
-   	 	{
-			Log.i(TAG, "Cursor is not null");
-	        String[] from = new String[] { DataProvider.COLUMN_PHONE, DataProvider.COLUMN_NAME, DataProvider.COLUMN_ADDRESS};
-	        int[] to = new int[] { R.id.phone, R.id.name, R.id.address};
-	        sca = new SimpleCursorAdapter(getBaseContext(),R.layout.contact_list , c, from, to);
-	        setListAdapter(sca);	        
-		}
-		else 
-		{
-			Log.i(TAG, "Cursor is null");
-		}
+		Log.i(TAG, "Bind data to listview");
+	    String[] from = new String[] { DataProvider.COLUMN_PHONE, DataProvider.COLUMN_NAME, DataProvider.COLUMN_ADDRESS};
+	    int[] to = new int[] { R.id.phone, R.id.name, R.id.address};
+	    sca = new SimpleCursorAdapter(getBaseContext(),R.layout.contact_list , c, from, to);
+	    setListAdapter(sca);
+   	 	r = 0;
     }
     
     public boolean onCreateOptionsMenu(Menu menu)
@@ -425,4 +496,5 @@ public class ContactSearch extends ListActivity {
     	String value = prefs.getString(key, "0");
     	return value;
 	}
+    
 }

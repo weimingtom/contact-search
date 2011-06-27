@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class Modify extends Activity {
-	private long id;
+	private String id;
 	private EditText phone;
 	private EditText name;
 	private EditText address;
@@ -26,8 +26,8 @@ public class Modify extends Activity {
 	
 	 	Bundle bundle = this.getIntent().getExtras();
 	    
-	 	id = Long.parseLong(bundle.getString("id"));
-	 	if (id > 0)
+	 	id = bundle.getString("id");
+	 	if (id != "")
 	 	{
 		 	phone.setText(bundle.getString("phone"));
 		 	name.setText(bundle.getString("name"));
@@ -96,11 +96,11 @@ public class Modify extends Activity {
         }
 		
 		ContentValues c = new ContentValues();
-		c.put("phone", Integer.parseInt(_phone));
+		c.put("_id", _phone);
 		c.put("name", _name);
 		c.put("address", _address);
 		
-		if (id > 0)
+		if (id != "")
 		{
 			i = getContentResolver().update(DataProvider.CONTENT_URI, c, "_id=?", selectionArgs);
 		}
